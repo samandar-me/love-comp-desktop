@@ -9,15 +9,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen() {
+    var scope = rememberCoroutineScope()
     var boyName by remember {
         mutableStateOf("")
     }
     var girlName by remember {
         mutableStateOf("")
     }
+    var isLoading by remember { mutableStateOf(false) }
     var isDialogOpen by remember { mutableStateOf(false) }
     MaterialTheme {
         Column(
@@ -44,17 +48,26 @@ fun HomeScreen() {
                     Text(text = "Girl name")
                 }
             )
-            ExtendedFloatingActionButton(
-                backgroundColor = Color.Red,
-                onClick = {
-                    if (boyName.isNotBlank() && girlName.isNotBlank()) {
-                         isDialogOpen = true
-                    }
-                },
-                text = {
-                    Text(text = "Generate Love!")
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.Red)
+                scope.launch {
+                    delay(2000L)
+                    isDialogOpen = true
+                    isLoading = false
                 }
-            )
+            } else {
+                ExtendedFloatingActionButton(
+                    backgroundColor = Color.Red,
+                    onClick = {
+                        if (boyName.isNotBlank() && girlName.isNotBlank()) {
+                            isLoading = true
+                        }
+                    },
+                    text = {
+                        Text(text = "Generate Love!")
+                    }
+                )
+            }
         }
     }
     if (isDialogOpen) {
